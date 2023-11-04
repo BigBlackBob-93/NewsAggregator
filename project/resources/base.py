@@ -1,0 +1,44 @@
+from abc import ABC, abstractmethod
+from requests import (
+    get,
+    Response,
+)
+from pydantic import BaseModel
+
+
+class Article(BaseModel):
+    header: str
+    annotation: str
+    author: str = 'John Doe'
+    date: str | None = None
+
+
+class History:
+    def __init__(self):
+        self.registry: list[str] | None = None
+
+    def upd(self, header: str) -> None:
+        if self.registry is None:
+            self.registry = [header]
+        else:
+            self.registry.append(header)
+
+    def is_unique(self, header: str) -> bool:
+        if self.registry is not None:
+            return not (header in self.registry)
+        return True
+
+
+class News(ABC):
+
+    def __init__(self, url: str):
+        self.url: str = url
+        self.history: History = History()
+
+    @abstractmethod
+    def get_html(self) -> Response:
+        return get(url=self.url)
+
+    @abstractmethod
+    def parse_html(self, html: str) -> None:
+        pass
