@@ -1,9 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import (
+    ABC,
+    abstractmethod,
+)
+from pydantic import BaseModel
 from requests import (
     get,
     Response,
 )
-from pydantic import BaseModel
 
 
 class Article(BaseModel):
@@ -40,5 +43,5 @@ class News(ABC):
         return get(url=self.url)
 
     @abstractmethod
-    def parse_html(self, html: str) -> None:
+    def get_new_article(self, html: str) -> Article | None:
         pass

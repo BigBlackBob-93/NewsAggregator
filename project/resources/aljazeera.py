@@ -1,9 +1,9 @@
+from bs4 import BeautifulSoup
 from project.resources.base import (
     News,
     Response,
     Article,
 )
-from bs4 import BeautifulSoup
 
 
 class Aljazeera(News):
@@ -13,7 +13,7 @@ class Aljazeera(News):
     def get_html(self) -> Response:
         return super().get_html()
 
-    def parse_html(self, html: str) -> None:
+    def get_new_article(self, html: str) -> Article | None:
         soup = BeautifulSoup(html, "html.parser")
 
         for new in soup.find(id="news-feed-container").find_all('article'):
@@ -28,4 +28,4 @@ class Aljazeera(News):
                     date=new.find('div', class_='gc__date__date').find('span').text.replace('Published On ', ''),
                 )
 
-                print(f'Resource - {self.__class__.__name__}:{article}')
+                yield article

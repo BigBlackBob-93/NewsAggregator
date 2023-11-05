@@ -1,11 +1,11 @@
+from bs4 import (
+    BeautifulSoup,
+    Tag,
+)
 from project.resources.base import (
     News,
     Response,
     Article,
-)
-from bs4 import (
-    BeautifulSoup,
-    Tag,
 )
 
 
@@ -16,7 +16,7 @@ class Altair(News):
     def get_html(self) -> Response:
         return super().get_html()
 
-    def parse_html(self, html: str) -> None:
+    def get_new_article(self, html: str) -> Article | None:
         soup = BeautifulSoup(html, "html.parser")
 
         main: Tag = soup.find('div', class_='colMain')
@@ -40,4 +40,4 @@ class Altair(News):
                         date=dates[index].text.replace('\xa0', ' '),
                     )
 
-                    print(f'Resource - {self.__class__.__name__}:{article}')
+                    yield article

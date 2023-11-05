@@ -1,11 +1,14 @@
 from project.resources.altair import Altair
 from project.resources.aljazeera import Aljazeera
 from project.resources.globaltimes import GlobalTimes
-
-
-def crt_html(text: str, name: str) -> None:
-    with open(name + '.html', 'w', encoding="utf-8") as f:
-        f.write(text)
+from project.resources.globaltimes import News
+from threading import Thread
+import keyboard
+from queue import Queue
+from time import (
+    sleep,
+    time,
+)
 
 
 def get_html(name: str) -> str:
@@ -13,18 +16,40 @@ def get_html(name: str) -> str:
         return f.read()
 
 
+def scraper(resource: News, queue: Queue) -> None:
+    # html = get_html(resource.__class__.__name__)
+    html: str = resource.get_html().text
+    for article in resource.get_new_article(html=html):
+        queue.put(article)
+
+
+def update(queue: Queue, resources: tuple) -> None:
+    for resource in resources:
+        Thread(
+            target=scraper,
+            args=(
+                resource,
+                queue,
+            ),
+        ).start()
+
+
 if __name__ == '__main__':
-    altair: Altair = Altair()
-    altair.parse_html(
-        html=altair.get_html().text,
+    res: tuple = (
+        Altair(),
+        GlobalTimes(),
+        Aljazeera(),
     )
 
-    aljazeera: Aljazeera = Aljazeera()
-    aljazeera.parse_html(
-        html=aljazeera.get_html().text,
-    )
+    q = Queue()
 
-    global_times: GlobalTimes = GlobalTimes()
-    global_times.parse_html(
-        html=global_times.get_html().text,
-    )
+    start = time()
+    update(queue=q, resources=res)
+
+    while not keyboard.is_pressed('ctrl + c'):
+        if (time() - start) >= 60:
+            start = time()
+            update(queue=q, resources=res)
+        if not q.empty():
+            print(q.get())
+            sleep(0.5)

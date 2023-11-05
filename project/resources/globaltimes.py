@@ -1,9 +1,9 @@
+from bs4 import BeautifulSoup
 from project.resources.base import (
     News,
     Response,
     Article,
 )
-from bs4 import BeautifulSoup
 
 
 class GlobalTimes(News):
@@ -13,7 +13,7 @@ class GlobalTimes(News):
     def get_html(self) -> Response:
         return super().get_html()
 
-    def parse_html(self, html: str) -> None:
+    def get_new_article(self, html: str) -> Article | None:
         soup = BeautifulSoup(html, "html.parser")
 
         for new in soup.findAll('div', class_='list_info'):
@@ -34,4 +34,4 @@ class GlobalTimes(News):
                     date=other[1].split(' ')[2],
                 )
 
-                print(f'Resource - {self.__class__.__name__}:{article}')
+                yield article
