@@ -2,6 +2,7 @@ from abc import (
     ABC,
     abstractmethod,
 )
+
 from pydantic import BaseModel
 from requests import (
     get,
@@ -38,7 +39,6 @@ class News(ABC):
         self.url: str = url
         self.history: History = History()
 
-    @abstractmethod
     def get_html(self) -> Response:
         return get(url=self.url)
 

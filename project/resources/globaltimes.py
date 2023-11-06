@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
+
 from project.resources.base import (
     News,
-    Response,
     Article,
 )
 
@@ -9,9 +9,6 @@ from project.resources.base import (
 class GlobalTimes(News):
     def __init__(self):
         super().__init__(url='https://www.globaltimes.cn/life/index.html')
-
-    def get_html(self) -> Response:
-        return super().get_html()
 
     def get_new_article(self, html: str) -> Article | None:
         soup = BeautifulSoup(html, "html.parser")
